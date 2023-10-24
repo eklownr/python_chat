@@ -17,7 +17,8 @@ def generate_unique_code(length):
         
         if code not in rooms:
             break
-    
+    # default room="hemma"
+    code = "hemma"
     return code
 
 @app.route("/", methods=["POST", "GET"])
