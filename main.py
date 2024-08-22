@@ -3,11 +3,13 @@ from flask_socketio import join_room, leave_room, send, SocketIO
 import random
 from string import ascii_uppercase
 
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "hjhjsdahhds"
 socketio = SocketIO(app)
 
 rooms = {}
+
 
 def generate_unique_code(length):
     while True:
@@ -20,6 +22,7 @@ def generate_unique_code(length):
     # default room="hemma"
     code = "hemma"
     return code
+
 
 @app.route("/", methods=["POST", "GET"])
 def home():
@@ -49,6 +52,7 @@ def home():
 
     return render_template("home.html")
 
+
 @app.route("/room")
 def room():
     room = session.get("room")
@@ -56,6 +60,7 @@ def room():
         return redirect(url_for("home"))
 
     return render_template("room.html", code=room, messages=rooms[room]["messages"])
+
 
 @socketio.on("message")
 def message(data):
@@ -70,6 +75,7 @@ def message(data):
     send(content, to=room)
     rooms[room]["messages"].append(content)
     print(f"{session.get('name')} said: {data['data']}")
+
 
 @socketio.on("connect")
 def connect(auth):
@@ -86,6 +92,7 @@ def connect(auth):
     rooms[room]["members"] += 1
     print(f"{name} joined room {room}")
 
+
 @socketio.on("disconnect")
 def disconnect():
     room = session.get("room")
@@ -99,6 +106,7 @@ def disconnect():
     
     send({"name": name, "message": "has left the room"}, to=room)
     print(f"{name} has left the room {room}")
+
 
 if __name__ == "__main__":
     socketio.run(app, debug=True, host="192.168.5.11")
